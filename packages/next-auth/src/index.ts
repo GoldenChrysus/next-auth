@@ -402,7 +402,7 @@ export default function NextAuth(
     }
   }
   setEnvDefaults(config)
-  const httpHandler = (req: NextRequest) => Auth(reqWithEnvURL(req), config)
+  const httpHandler = (req: NextRequest) => Auth(reqWithEnvURL(req, config), config)
   return {
     handlers: { GET: httpHandler, POST: httpHandler } as const,
     // @ts-expect-error

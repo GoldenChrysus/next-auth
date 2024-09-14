@@ -4,8 +4,9 @@ import type { NextAuthConfig } from "./index.js"
 import { setEnvDefaults as coreSetEnvDefaults } from "@auth/core"
 
 /** If `NEXTAUTH_URL` or `AUTH_URL` is defined, override the request's URL. */
-export function reqWithEnvURL(req: NextRequest): NextRequest {
-  const url = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL
+export function reqWithEnvURL(req: NextRequest, config?: NextAuthConfig): NextRequest {
+  // @ts-ignore
+  const url = config?.baseUrl(req) ?? process.env.AUTH_URL ?? process.env.NEXTAUTH_URL
   if (!url) return req
   const { origin: envOrigin } = new URL(url)
   const { href, origin } = req.nextUrl

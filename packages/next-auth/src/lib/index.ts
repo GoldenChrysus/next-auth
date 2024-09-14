@@ -17,6 +17,7 @@ import type { NextFetchEvent, NextMiddleware, NextRequest } from "next/server"
 
 /** Configure NextAuth.js. */
 export interface NextAuthConfig extends Omit<AuthConfig, "raw"> {
+  baseUrl?: (req: NextRequest) => string,
   /**
    * Callbacks are asynchronous functions you can use to control what happens when an auth-related action is performed.
    * Callbacks **allow you to implement access controls without a database** or to **integrate with external databases or APIs**.
@@ -232,7 +233,7 @@ async function handleAuth(
   config: NextAuthConfig,
   userMiddlewareOrRoute?: NextAuthMiddleware | AppRouteHandlerFn
 ) {
-  const request = reqWithEnvURL(args[0])
+  const request = reqWithEnvURL(args[0], config)
   const sessionResponse = await getSession(request.headers, config)
   const auth = await sessionResponse.json()
 
