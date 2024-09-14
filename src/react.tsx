@@ -71,10 +71,6 @@ export const __NEXTAUTH: AuthClientConfig = {
 
 let broadcastChannel: BroadcastChannel | null = null
 
-function getNewBroadcastChannel() {
-  return new BroadcastChannel("next-auth")
-}
-
 function broadcast() {
   if (typeof BroadcastChannel === "undefined") {
     return {
@@ -85,7 +81,7 @@ function broadcast() {
   }
 
   if (broadcastChannel === null) {
-    broadcastChannel = getNewBroadcastChannel()
+    broadcastChannel = new BroadcastChannel("next-auth")
   }
 
   return broadcastChannel
@@ -182,8 +178,7 @@ export async function getSession(params?: GetSessionParams) {
     params
   )
   if (params?.broadcast ?? true) {
-    const broadcastChannel = getNewBroadcastChannel()
-    broadcastChannel.postMessage({
+    broadcast().postMessage({
       event: "session",
       data: { trigger: "getSession" },
     })
@@ -484,7 +479,7 @@ export function SessionProvider(props: SessionProviderProps) {
           ? "authenticated"
           : "unauthenticated",
       async update(data: any) {
-        if (loading) return
+        if (loading || !session) return
         setLoading(true)
         const newSession = await fetchData<Session>(
           "session",

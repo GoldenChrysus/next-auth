@@ -83,8 +83,7 @@ import type {
   AppRouteHandlerFn,
   AppRouteHandlerFnContext,
 } from "./lib/types.js"
-// @ts-expect-error Next.js does not yet correctly use the `package.json#exports` field
-import type { NextRequest } from "next/server"
+import type { NextRequest } from "next/server.js"
 import type { NextAuthConfig, NextAuthRequest } from "./lib/index.js"
 export { AuthError, CredentialsSignin } from "@auth/core/errors"
 
@@ -376,7 +375,7 @@ export default function NextAuth(
     const httpHandler = async (req: NextRequest) => {
       const _config = await config(req)
       setEnvDefaults(_config)
-      return Auth(reqWithEnvURL(req), _config)
+      return Auth(reqWithEnvURL(req, _config), _config)
     }
 
     return {

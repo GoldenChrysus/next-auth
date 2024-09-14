@@ -1,11 +1,9 @@
-// @ts-expect-error Next.js does not yet correctly use the `package.json#exports` field
-import { NextRequest } from "next/server"
+import { NextRequest } from "next/server.js"
 import type { NextAuthConfig } from "./index.js"
 import { setEnvDefaults as coreSetEnvDefaults } from "@auth/core"
 
 /** If `NEXTAUTH_URL` or `AUTH_URL` is defined, override the request's URL. */
 export function reqWithEnvURL(req: NextRequest, config?: NextAuthConfig): NextRequest {
-  // @ts-ignore
   const url = config?.baseUrl(req) ?? process.env.AUTH_URL ?? process.env.NEXTAUTH_URL
   if (!url) return req
   const { origin: envOrigin } = new URL(url)
@@ -29,10 +27,8 @@ export function setEnvDefaults(config: NextAuthConfig) {
     if (pathname === "/") return
     config.basePath ||= pathname
   } catch {
-    // Catching and swallowing potential URL parsing errors, we'll fall
-    // back to `/api/auth` below.
   } finally {
     config.basePath ||= "/api/auth"
-    coreSetEnvDefaults(process.env, config, true)
+    coreSetEnvDefaults(process.env, config)
   }
 }

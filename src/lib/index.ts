@@ -1,8 +1,6 @@
 import { Auth, createActionURL, type AuthConfig } from "@auth/core"
-// @ts-expect-error Next.js does not yet correctly use the `package.json#exports` field
-import { headers } from "next/headers"
-// @ts-expect-error Next.js does not yet correctly use the `package.json#exports` field
-import { NextResponse } from "next/server"
+import { headers } from "next/headers.js"
+import { NextResponse } from "next/server.js"
 import { reqWithEnvURL } from "./env.js"
 
 import type { AuthAction, Awaitable, Session } from "@auth/core/types"
@@ -12,12 +10,15 @@ import type {
   NextApiResponse,
 } from "next"
 import type { AppRouteHandlerFn } from "./types.js"
-// @ts-expect-error Next.js does not yet correctly use the `package.json#exports` field
-import type { NextFetchEvent, NextMiddleware, NextRequest } from "next/server"
+import type {
+  NextFetchEvent,
+  NextMiddleware,
+  NextRequest,
+} from "next/server.js"
 
 /** Configure NextAuth.js. */
 export interface NextAuthConfig extends Omit<AuthConfig, "raw"> {
-  baseUrl?: (req: NextRequest) => string,
+  baseUrl?: (req: NextRequest) => string | undefined,
   /**
    * Callbacks are asynchronous functions you can use to control what happens when an auth-related action is performed.
    * Callbacks **allow you to implement access controls without a database** or to **integrate with external databases or APIs**.
@@ -67,7 +68,7 @@ async function getSession(headers: Headers, config: NextAuthConfig) {
     headers.get("x-forwarded-proto"),
     headers,
     process.env,
-    config
+    config.basePath
   )
   const request = new Request(url, {
     headers: { cookie: headers.get("cookie") ?? "" },
@@ -163,6 +164,7 @@ export function initAuth(
       // API Routes, getServerSideProps
       const request = "req" in args[0] ? args[0].req : args[0]
       const response: any = "res" in args[0] ? args[0].res : args[1]
+      // @ts-expect-error -- request is NextRequest
       const _config = await config(request)
       onLazyLoad?.(_config)
 
@@ -264,6 +266,7 @@ async function handleAuth(
     const augmentedReq = request as NextAuthRequest
     augmentedReq.auth = auth
     response =
+      // @ts-expect-error
       (await userMiddlewareOrRoute(augmentedReq, args[1])) ??
       NextResponse.next()
   } else if (!authorized) {

@@ -1,8 +1,6 @@
 import { Auth, raw, skipCSRFCheck, createActionURL } from "@auth/core"
-// @ts-expect-error Next.js does not yet correctly use the `package.json#exports` field
-import { headers as nextHeaders, cookies } from "next/headers"
-// @ts-expect-error Next.js does not yet correctly use the `package.json#exports` field
-import { redirect } from "next/navigation"
+import { headers as nextHeaders, cookies } from "next/headers.js"
+import { redirect } from "next/navigation.js"
 
 import type { NextAuthConfig } from "./index.js"
 import type { NextAuthResult, Session } from "../index.js"
@@ -29,7 +27,7 @@ export async function signIn(
     headers.get("x-forwarded-proto"),
     headers,
     process.env,
-    config
+    config.basePath
   )
 
   if (!provider) {
@@ -99,7 +97,7 @@ export async function signOut(
     headers.get("x-forwarded-proto"),
     headers,
     process.env,
-    config
+    config.basePath
   )
   const callbackUrl = options?.redirectTo ?? headers.get("Referer") ?? "/"
   const body = new URLSearchParams({ callbackUrl })
@@ -128,7 +126,7 @@ export async function update(
     headers.get("x-forwarded-proto"),
     headers,
     process.env,
-    config
+    config.basePath
   )
   const body = JSON.stringify({ data })
   const req = new Request(url, { method: "POST", headers, body })
